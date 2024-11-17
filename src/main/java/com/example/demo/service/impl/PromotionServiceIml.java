@@ -13,13 +13,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.entity.PromotionEntity;
 import com.example.demo.map.PromotionMapper;
 import com.example.demo.repository.PromotionRepository;
 import com.example.demo.request.PromotionRequestDTO;
-import com.example.demo.respone.ApiRespone;
 import com.example.demo.respone.PromotionResponeDTO;
 import com.example.demo.service.PromotionService;
 
@@ -48,31 +46,36 @@ public class PromotionServiceIml implements PromotionService{
 		if (promotionEntity != null) {
 			throw new RuntimeException("Promotion_already_exist");
 		}
-		requestDTO.setDeleted(false);
-		promotionEntity = mapper.toPromotionEntity(requestDTO);
 		
+		requestDTO.setDeleted(false);
+		
+		promotionEntity = mapper.toPromotionEntity(requestDTO);
+		System.out.println(promotionEntity);
 		return mapper.toPromotionResponeDTO(promotionRepository.save(promotionEntity));
 	}
 	
 	@Override
 	public PromotionResponeDTO updatePromotion(int idPromotion, @Valid PromotionRequestDTO requestDTO) {
-	
+		System.out.println(idPromotion);
 		PromotionEntity promotionEntity = promotionRepository.findById(idPromotion)
 				.orElseThrow(() -> new RuntimeException("Promotion_not_exist"));
 		promotionEntity = promotionRepository.findByNamePromotion(requestDTO.getNamePromotion().trim());
 		if (promotionEntity != null && promotionEntity.getIdPromotion()!=idPromotion ) {
 			throw new RuntimeException("Promotion_already_exist");
 		}
+		System.out.println(requestDTO);
 		promotionEntity = mapper.toPromotionEntity(requestDTO);
 		promotionEntity.setIdPromotion(idPromotion);
+		System.out.println(promotionEntity);
+		System.out.println(promotionEntity.isIncreasePrice());
+		
 		promotionRepository.save(promotionEntity);
 
 		return mapper.toPromotionResponeDTO(promotionEntity);
 	}
 
 	@Override
-	public PromotionResponeDTO deletePromotion(int idPromotion) {
-		PromotionEntity promotionEntity = promotionRepository.findById(idPromotion)
+	public PromotionResponeDTO deletePromotion(int idPromotion) { PromotionEntity promotionEntity = promotionRepository.findById(idPromotion)
 				.orElseThrow(() -> new RuntimeException("Promotion_not_exist"));
 		promotionEntity.setDeleted(true);
     	promotionRepository.save(promotionEntity);
@@ -80,7 +83,7 @@ public class PromotionServiceIml implements PromotionService{
 	         
 	}
 	@Override
-	public Page<PromotionResponeDTO> getPromotionFromFilter(String namePromotion, String status,String sortField,String sortDirection, Pageable pageable) {
+	public Page<PromotionResponeDTO> getPromotionFromFilter(String namePromotion, String status,String isIncreasePrice,String sortField,String sortDirection, Pageable pageable) {
 	    try {
 	        Date currentDate = new Date();
 	        Specification<PromotionEntity> spec = Specification.where(
@@ -91,6 +94,11 @@ public class PromotionServiceIml implements PromotionService{
 	            spec = spec.and((root, query, criteriaBuilder) ->
 	                    criteriaBuilder.like(root.get("namePromotion"), "%" + namePromotion + "%"));
 	        }
+	        if(isIncreasePrice!=null){
+	        	spec = spec.and((root, query, criteriaBuilder) ->
+	        	criteriaBuilder.equal(root.get("isIncreasePrice"), Boolean.valueOf(isIncreasePrice)));
+	         }
+
 	        if (status != null && !status.isEmpty()) {
 	            if ("expired".equals(status)) {
 	                spec = spec.and((root, query, criteriaBuilder) ->
@@ -114,37 +122,5 @@ public class PromotionServiceIml implements PromotionService{
 	        throw new RuntimeException("Promotion_not_found");
 	    }
 	}
-//	@Override
-//	public Page<PromotionResponeDTO> getPromotionFromFilter(String namePromotion,String status, Pageable pageable) {
-//		 try {
-//			 Date currentDate = new Date();
-//			 Specification<PromotionEntity> spec = Specification.where(
-//					    (root, query, criteriaBuilder) -> criteriaBuilder.notEqual(root.get("isDeleted"), true)
-//					);
-//			 
-//			    if (namePromotion != null && !namePromotion.isEmpty()) {
-//			        spec = spec.and((root, query, criteriaBuilder) ->
-//			                criteriaBuilder.like(root.get("namePromotion"), "%" + namePromotion + "%"));
-//			    }
-//			    if (status != null && !status.isEmpty()) {
-//			    	if ("expired".equals(status)) {
-//			            spec = spec.and((root, query, criteriaBuilder) ->
-//			                criteriaBuilder.lessThan(root.get("endDate"), currentDate));
-//			        } else if ("active".equals(status)) {
-//			            spec = spec.and((root, query, criteriaBuilder) ->
-//			                criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), currentDate));
-//			        }
-//			      }
-//			    Page<PromotionEntity> entities = promotionRepository.findAll(spec, pageable);
-//
-//			    List<PromotionResponeDTO> prosDtos = entities.stream()
-//			            .map(mapper::toPromotionResponeDTO)
-//			            .collect(Collectors.toList());
-//
-//			    return new PageImpl<>(prosDtos, pageable, entities.getTotalElements());
-//	        } catch (NumberFormatException e) {
-//	            throw new RuntimeException("Promotion_not_found");
-//	        }
-//
-//}
+
 	}
