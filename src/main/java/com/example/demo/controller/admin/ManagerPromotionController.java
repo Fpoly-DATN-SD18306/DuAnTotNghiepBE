@@ -3,7 +3,6 @@ package com.example.demo.controller.admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import com.example.demo.request.PromotionRequestDTO;
 import com.example.demo.respone.ApiRespone;
@@ -41,7 +40,8 @@ public class ManagerPromotionController {
 	    }
 	    @PostMapping
 	    public ApiRespone<?> postPromotion(@ModelAttribute PromotionRequestDTO requestDTO ) {
-	        System.out.println(requestDTO.toString());
+	    	
+	        
 	        return ApiRespone.builder()
 	                .result(promotionService.savePromotion(requestDTO))
 	                .build();
@@ -50,7 +50,7 @@ public class ManagerPromotionController {
 	    
 	    @PutMapping("{idPromotion}")
 	    public ApiRespone<?> putPromotion(@PathVariable("idPromotion") int idPromotion ,@ModelAttribute @Valid PromotionRequestDTO requestDTO ) {
-	     
+	   
 	        return ApiRespone.builder()
 	                .result(promotionService.updatePromotion(idPromotion,requestDTO))
 	                .build();
@@ -67,14 +67,15 @@ public class ManagerPromotionController {
 	    public ApiRespone<?> getPromotionFromFilter(
 	            @RequestParam(required = false) String namePromotion,
 	            @RequestParam(required = false) String status,
+	            @RequestParam(required = false) String isIncreasePrice,
 	    		@RequestParam(value = "sortBy",required = false) String sortField,
 	    		@RequestParam(value = "orderBy", required = false) String sortDirection,
-	            @RequestParam(value = "page", defaultValue = "0") int page,
+@RequestParam(value = "page", defaultValue = "0") int page,
 	            @RequestParam(value = "size", defaultValue = "10") int size
 	           ) {
 	        Pageable pageable = PageRequest.of(page, size);
 	        return ApiRespone.builder()
-	                .result(promotionService.getPromotionFromFilter(namePromotion, status,sortField,sortDirection, pageable))
+	                .result(promotionService.getPromotionFromFilter(namePromotion, status,isIncreasePrice,sortField,sortDirection, pageable))
 	                .build();
 	    }
 
