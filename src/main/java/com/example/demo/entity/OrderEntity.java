@@ -4,49 +4,65 @@ import java.util.Date;
 import java.util.List;
 
 import com.example.demo.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder @Getter @Setter
 public class OrderEntity extends BaseEntity {
 
-	@Id 
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int idOrder;
-	@NotNull
+	Integer idOrder;
+	@Column(columnDefinition = "varchar(50)")
 	@Enumerated(EnumType.STRING)
 	private OrderStatus statusOrder;
-	@NotNull
+	double total;
+	Boolean isPrinted;
+	String namePaymentMethod;
+	Date paymentDate;
+	String cancellationReason;
 
-	@OneToOne
+	@NotNull
+	@ManyToOne
 	@JoinColumn(name = "id_table")
+	@JsonBackReference
 	TableEntity tableEntity;
+
 	@ManyToOne
 	@JoinColumn(name = "id_User")
 	UserEnitty userEnitty;
 
-	@OneToMany(mappedBy = "orderEntity")
+	@ManyToOne
+	@JoinColumn(name = "id_Customer")
+	CustomerEntity customer;
+
+	@OneToMany(mappedBy = "orderEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
 	List<OrderDetailEntity> listOrderDetail;
+
+	@ManyToOne
+	@JoinColumn(name = "idShift")
+	@JsonBackReference
+	Shift shift;
+
+
+	public double getTotalNeedPayment() {
+		return total;
+	}
+
+	@ManyToOne
+	@JoinColumn(name = "id_Promotion")
+	PromotionEntity promotionEntity;
+
+
 
 }

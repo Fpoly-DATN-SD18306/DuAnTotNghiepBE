@@ -37,7 +37,23 @@ public class FoodServiceImpl implements FoodService {
 	@Override
 	public Page<FoodResponeDTO> getAllFood() {
 
-		return new PageImpl<>(foodRepository.findAll().stream().map(foodMapper::toFoodResponeDTO).collect(Collectors.toList()));
+		return new PageImpl<>(
+				foodRepository.findAll().stream().map(foodMapper::toFoodResponeDTO).collect(Collectors.toList()));
+	}
+
+	@Override
+	public List<FoodResponeDTO> getFoodByIdCategory(int idCategory) {
+		// Lấy CategoryFoodEntity từ repository
+		CategoryFoodEntity category = categoryRepository.findById(idCategory)
+				.orElseThrow(() -> new RuntimeException("CATEGORY_NOT_EXISTS"));
+
+		// Lấy danh sách món ăn theo category
+		List<FoodEntity> foodEntities = foodRepository.findByCategory(category);
+
+		// Ánh xạ từ FoodEntity sang FoodResponeDTO
+		return foodEntities.stream()
+				.map(foodMapper::toFoodResponeDTO)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -67,7 +83,8 @@ public class FoodServiceImpl implements FoodService {
 			fileService.saveFile(file);
 		}
 		foodEntity.setCategory(categoryFood);
-
+		System.out.println(requestDTO.getDiscount());
+		System.out.println(foodEntity.getDiscount());
 		return foodMapper.toFoodResponeDTO(foodRepository.save(foodEntity));
 	}
 
@@ -79,7 +96,10 @@ public class FoodServiceImpl implements FoodService {
 		FoodEntity foodEntity = foodRepository.findById(idFood)
 				.orElseThrow(() -> new RuntimeException("FOOD_NOT_EXISTS"));
 		String imgFoodTemp = foodEntity.getImgFood();
-
+		foodEntity = foodRepository.findByNameFood(requestDTO.getNameFood().trim());
+		if (foodEntity != null && foodEntity.getIdFood() != idFood) {
+			throw new RuntimeException("FOOD_ALREADY_EXISTS");
+		}
 		foodEntity = foodMapper.toFoodEntity(requestDTO);
 
 		if (file != null && !file.getOriginalFilename().trim().equals("")) {
@@ -99,43 +119,42 @@ public class FoodServiceImpl implements FoodService {
 	}
 
 	@Override
-	public Page<FoodResponeDTO> getFoodFromFilter(String nameFood, String idCategory, String isSelling, Pageable pageable) {
+	public Page<FoodResponeDTO> getFoodFromFilter(String nameFood, String idCategory, String isSelling,
+			Pageable pageable) {
 
-		Specification<FoodEntity> specsFood = Specification.where(FoodSpecs.hasNameFood(nameFood)
-				.and(FoodSpecs.hasIdCategory(idCategory))
-				.and(FoodSpecs.isSelling(isSelling)));
-		return	foodRepository.findAll(specsFood, pageable).map(foodMapper::toFoodResponeDTO);
+		Specification<FoodEntity> specsFood = Specification.where(
+				FoodSpecs.hasNameFood(nameFood)
+						.and(FoodSpecs.hasIdCategory(idCategory))
+						.and(FoodSpecs.isSelling(isSelling)));
+		return foodRepository.findAll(specsFood, pageable).map(foodMapper::toFoodResponeDTO);
 
 	}
 
 	@Override
 	public Page<FoodResponeDTO> getFoodFromFilter(String nameFood, String idCategory, Pageable pageable) {
-		  try {
+		try {
 
-	            Integer categoryId = idCategory == null ? null : Integer.parseInt(idCategory);
-	            System.out.println("idCategory"+categoryId);
-	            List<FoodEntity> foodEntities = foodRepository.findAll();
-	            if (categoryId != null) {
-	                foodEntities = foodEntities
-	                        .stream()
-	                        .filter(foodEntity -> foodEntity.getCategory().getIdCategory() == categoryId).toList();
-	            }
-	            if (nameFood != null) {
-	                foodEntities = foodEntities
-	                        .stream()
-	                        .filter(foodEntity -> foodEntity.getNameFood().contains(nameFood)).toList();
-	            }
+			Integer categoryId = idCategory == null ? null : Integer.parseInt(idCategory);
+			System.out.println("idCategory" + categoryId);
+			List<FoodEntity> foodEntities = foodRepository.findAll();
+			if (categoryId != null) {
+				foodEntities = foodEntities
+						.stream()
+						.filter(foodEntity -> foodEntity.getCategory().getIdCategory() == categoryId).toList();
+			}
+			if (nameFood != null) {
+				foodEntities = foodEntities
+						.stream()
+						.filter(foodEntity -> foodEntity.getNameFood().contains(nameFood)).toList();
+			}
 
-	            List<FoodResponeDTO> foodDtos = foodEntities.stream()
-	                    .map(foodMapper::toFoodResponeDTO)
-	                    .collect(Collectors.toList());
-	            return new PageImpl<>(foodDtos);
-	        } catch (NumberFormatException e) {
-	            throw new RuntimeException("Invalid_id_Category");
-	        }
+			List<FoodResponeDTO> foodDtos = foodEntities.stream()
+					.map(foodMapper::toFoodResponeDTO)
+					.collect(Collectors.toList());
+			return new PageImpl<>(foodDtos);
+		} catch (NumberFormatException e) {
+			throw new RuntimeException("Invalid_id_Category");
+		}
 	}
 
-
-
 }
-

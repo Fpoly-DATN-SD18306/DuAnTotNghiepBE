@@ -13,10 +13,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FoodRepository extends JpaRepository<FoodEntity, Integer>, JpaSpecificationExecutor<FoodEntity> {
     FoodEntity findByNameFood(String name);
-	Page<FoodEntity> findAll(Specification<FoodEntity> spec, Pageable pageable);
-	List<FoodEntity> findAll();
 
+    Page<FoodEntity> findAll(Specification<FoodEntity> spec, Pageable pageable);
 
+    List<FoodEntity> findAll();
 
     List<FoodEntity> findByCategory(CategoryFoodEntity category);
 
