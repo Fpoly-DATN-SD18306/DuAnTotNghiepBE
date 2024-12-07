@@ -32,17 +32,17 @@ public class PaymentService {
     TableRepository tableRepository;
 
     public void paymentBycash(int idOrder , int idPromotion) {
-    	
+
         OrderEntity orderNeedPayment = orderRepository
                 .findById(idOrder)
                 .orElseThrow(() -> new RuntimeException("Order_not_found"));
-     
+
         if (orderNeedPayment.getStatusOrder() == OrderStatus.Completed) {
             throw new RuntimeException("Order_already_completed");
         }
         PromotionEntity promotionEntity = promotionRepository.findByIdPromotion(idPromotion);
         if (promotionEntity == null) {
-        	orderNeedPayment.setPromotionEntity(null); 
+        	orderNeedPayment.setPromotionEntity(null);
             orderNeedPayment.setNamePaymentMethod(PaymentMethod.Cash.getName());
             orderNeedPayment.setStatusOrder(OrderStatus.Completed);
             orderNeedPayment.setPaymentDate(new Date());
@@ -56,13 +56,13 @@ public class PaymentService {
         } else {
         	 if(promotionEntity.isIncreasePrice()) {
       		   orderNeedPayment.setTotal(orderNeedPayment.getTotal()+(orderNeedPayment.getTotal() *promotionEntity.getDiscount() / 100));
-      	   
-      	  
+
+
          }else if (!promotionEntity.isIncreasePrice()) {
       	   orderNeedPayment.setTotal(orderNeedPayment.getTotal()-(orderNeedPayment.getTotal() *promotionEntity.getDiscount() / 100));
          }
-         
-          orderNeedPayment.setPromotionEntity(promotionEntity);   
+
+          orderNeedPayment.setPromotionEntity(promotionEntity);
           orderNeedPayment.setNamePaymentMethod(PaymentMethod.Cash.getName());
           orderNeedPayment.setStatusOrder(OrderStatus.Completed);
           orderNeedPayment.setPaymentDate(new Date());
@@ -74,7 +74,7 @@ public class PaymentService {
           table.setCurrentIP(null);
           tableRepository.save(table);
         }
-      
+
     }
 
     public VNPayResponseDTO paymentByVNpay(int idOrder, int idPromotion) {
@@ -84,23 +84,27 @@ public class PaymentService {
         if (orderNeedPayment.getStatusOrder() == OrderStatus.Completed) {
             throw new RuntimeException("Order_already_completed");
         }
-      
+
         PromotionEntity promotionEntity = promotionRepository.findByIdPromotion(idPromotion);
+         double totalNeedPay = orderNeedPayment.getTotal();
         try {
         	 if (promotionEntity != null) {
-        		 orderNeedPayment.setPromotionEntity(promotionEntity); 
-        	 
-        		 if(promotionEntity.isIncreasePrice()) {
-            		   orderNeedPayment.setTotal(orderNeedPayment.getTotal()+(orderNeedPayment.getTotal() *promotionEntity.getDiscount() / 100));
-            	
-               }else if (!promotionEntity.isIncreasePrice()) {
-            	   orderNeedPayment.setTotal(orderNeedPayment.getTotal()-(orderNeedPayment.getTotal() *promotionEntity.getDiscount() / 100));
+        		 orderNeedPayment.setPromotionEntity(promotionEntity);
+        	    boolean checkIncrease = promotionEntity.isIncreasePrice();
+        		 if(checkIncrease) {
+                     totalNeedPay = totalNeedPay +(totalNeedPay *promotionEntity.getDiscount() / 100);
+               }else {
+                     totalNeedPay = totalNeedPay -(totalNeedPay *promotionEntity.getDiscount() / 100);
                }
-        	 }
-        	orderRepository.save(orderNeedPayment);
+                 orderNeedPayment.setPromotionEntity(promotionEntity);
+
+        	 } else {
+                 orderNeedPayment.setPromotionEntity(null);
+             }
+            orderRepository.save(orderNeedPayment);
             return VNPayResponseDTO
                     .builder()
-                    .urlToRedirect(vnPayService.payment(orderNeedPayment.getTotalNeedPayment(),
+                    .urlToRedirect(vnPayService.payment(totalNeedPay,
                             String.valueOf(orderNeedPayment.getIdOrder()), null))
                     .build();
         } catch (IOException e) {
