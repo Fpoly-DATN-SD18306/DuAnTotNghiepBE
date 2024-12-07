@@ -162,6 +162,7 @@ public class VNPayService {
                                 orderNeedCheck.setStatusOrder(OrderStatus.Completed);
                                 orderNeedCheck.setPaymentDate(new Date());
                                 orderNeedCheck.setNamePaymentMethod(PaymentMethod.Ewallet.getName());
+                                orderNeedCheck.setTotal(Double.parseDouble(responseDTO.getTotalAmount())/100);
                                 orderRepository.save(orderNeedCheck);
                                 TableEntity table = orderNeedCheck.getTableEntity();
                                 table.setStatus(TableStatus.AVAILABLE);

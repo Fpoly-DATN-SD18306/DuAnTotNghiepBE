@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
@@ -43,6 +44,7 @@ public class PromotionEntity extends BaseEntity{
     String description;
     boolean isDeleted;
 	@OneToMany(mappedBy = "promotionEntity")
+	@JsonIgnore
 	List<OrderEntity> listOrder;
 	@Override
 	public String toString() {
