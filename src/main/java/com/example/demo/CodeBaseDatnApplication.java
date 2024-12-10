@@ -10,9 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableScheduling
 public class CodeBaseDatnApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(CodeBaseDatnApplication.class, args);
 	}
-
 }

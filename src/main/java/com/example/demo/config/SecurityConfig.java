@@ -20,9 +20,8 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
 	@Bean
-	public  PasswordEncoder passwordEncoder(){
+	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(10);
 	}
 
@@ -34,31 +33,30 @@ public class SecurityConfig {
 	@Autowired
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-	private String[] EndPointManager = {"/api/v1/users","/api/v1/users/**","/api/QRcode/**","/api/QRcode",
-			};
-	private String[] EndPointPublic = {"/api/v1/categories","/api/verify-table","/api/v1/order","/api/v1/order/**"
-			,"api/v1/foodEntities/**","/api/order","/api/order/**","api/v1/orderdetail","api/v1/orderdetail/**"
-			,"/api/v1/foods/filter","/api/login","/api/logout","/api/testVerify","/api/v1/ip","/api/v1/ip/**"
-			,"/ws/my-websocket-endpoint","/ws/my-websocket-endpoint/**","/images/**","/QRCode/**","api/payment-VNPay"
-	,"/api/v1/foods/**","/api/v1/foods","api/orderCustomer/**","/api/v1/tables","/api/v1/tables/**",
-	"/api/v1/separateandmergeorder","api/v1/separateandmergeorder/**","api/v1/promotions","api/v1/promotions/**"};
+	private String[] EndPointManager = { "/api/v1/users", "/api/v1/users/**", "/api/QRcode/**", "/api/QRcode",
+	};
+	private String[] EndPointPublic = { "/api/v1/categories", "/api/verify-table", "/api/v1/order", "/api/v1/order/**",
+			"api/v1/foodEntities/**", "/api/order", "/api/order/**", "api/v1/orderdetail", "api/v1/orderdetail/**",
+			"/api/v1/foods/filter", "/api/login", "/api/logout", "/api/testVerify", "/api/v1/ip", "/api/v1/ip/**",
+			"/ws/my-websocket-endpoint", "/ws/my-websocket-endpoint/**", "/images/**", "/QRCode/**",
+			"api/payment-VNPay", "/api/v1/foods/**", "/api/v1/foods", "api/orderCustomer/**", "/api/v1/tables",
+			"/api/v1/tables/**",
+			"/api/v1/separateandmergeorder", "api/v1/separateandmergeorder/**", "api/v1/promotions",
+			"api/v1/promotions/**" };
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(
-				(requests) ->
-				requests
+				(requests) -> requests
 						.requestMatchers(EndPointPublic).permitAll()
 						.requestMatchers(EndPointManager).hasAuthority("SCOPE_MANAGER")
-						.anyRequest().authenticated()
-		);
-		http.oauth2ResourceServer( oauth2 -> oauth2
-											.jwt(jwtConfig -> jwtConfig.decoder(jwtDecoder))
-											.authenticationEntryPoint(jwtAuthenticationEntryPoint));
-		http.csrf(csrf->csrf.disable());
+						.anyRequest().permitAll());
+		http.oauth2ResourceServer(oauth2 -> oauth2
+				.jwt(jwtConfig -> jwtConfig.decoder(jwtDecoder))
+				.authenticationEntryPoint(jwtAuthenticationEntryPoint));
+		http.csrf(csrf -> csrf.disable());
 
 		return http.build();
 	}
-
 
 }

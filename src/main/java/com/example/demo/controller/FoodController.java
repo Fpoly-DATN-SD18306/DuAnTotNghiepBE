@@ -30,10 +30,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @RestController
 @RequestMapping("api/v1/foodEntities")
-//@CrossOrigin("http://localhost:4200")
+// @CrossOrigin("http://localhost:4200")
 public class FoodController {
 	@Autowired
 	private FoodFindRepository foodFindRepository;
@@ -46,15 +45,14 @@ public class FoodController {
 	@Autowired
 	private CategoryServiceImpl categoryServiceImpl;
 
-	
-    @GetMapping("filter")
-    public ApiRespone<?>getFoodFromFilter(@RequestParam(required = false) String  nameFood,
-    		@RequestParam(required = false) String idCategory,
-    		@RequestParam(value = "page", defaultValue = "0") int page,
-    	    @RequestParam(value = "size", defaultValue = "10") int size){
-    	Pageable pageable = PageRequest.of(page, size);
-    	  return ApiRespone.builder()
-                  .result(foodService.getFoodFromFilter(nameFood,idCategory,pageable))
-                  .build();
-    }
+	@GetMapping("filter")
+	public ApiRespone<?> getFoodFromFilter(@RequestParam(required = false) String nameFood,
+			@RequestParam(required = false) String idCategory,
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return ApiRespone.builder()
+				.result(foodService.getFoodFromFilter(nameFood, idCategory, pageable))
+				.build();
+	}
 }

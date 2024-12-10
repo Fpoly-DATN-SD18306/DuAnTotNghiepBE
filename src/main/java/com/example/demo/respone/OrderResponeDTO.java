@@ -1,5 +1,7 @@
 package com.example.demo.respone;
 
+import java.util.Date;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +23,9 @@ public class OrderResponeDTO {
     String nameArea;
     String phoneCustomer;
     Double total;
+    Date dateCreate;
+    String fullname;
+    Date paymentDate;
     String namePaymentMethod;
     String cancellationReason;
     Boolean isPrinted;

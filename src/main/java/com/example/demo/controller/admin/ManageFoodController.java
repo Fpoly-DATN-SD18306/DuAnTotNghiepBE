@@ -1,5 +1,6 @@
 package com.example.demo.controller.admin;
 
+import com.example.demo.entity.FoodEntity;
 import com.example.demo.request.FoodRequestDTO;
 import com.example.demo.respone.ApiRespone;
 import com.example.demo.respone.FoodResponeDTO;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("api/v1/foods")
@@ -72,4 +75,10 @@ public class ManageFoodController {
     public ApiRespone<List<FoodResponeDTO>> getFoodByIdCategory(@PathVariable("idCategory") Integer idCategory) {
         return ApiRespone.<List<FoodResponeDTO>>builder().result(foodService.getFoodByIdCategory(idCategory)).build();
     }
+
+    @GetMapping("search")
+    public ApiRespone<?> searchByName(@RequestParam String nameFood) {
+        return ApiRespone.builder().result(foodService.searchByName(nameFood)).build();
+    }
+
 }

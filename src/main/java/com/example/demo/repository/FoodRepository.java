@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -19,5 +21,8 @@ public interface FoodRepository extends JpaRepository<FoodEntity, Integer>, JpaS
     List<FoodEntity> findAll();
 
     List<FoodEntity> findByCategory(CategoryFoodEntity category);
+
+    @Query("SELECT f FROM FoodEntity f WHERE f.nameFood LIKE CONCAT('%', :nameFood, '%')")
+    List<FoodEntity> findByNameLike(@Param("nameFood") String nameFood);
 
 }

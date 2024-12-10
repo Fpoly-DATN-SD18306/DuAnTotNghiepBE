@@ -28,7 +28,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Integer> {
                         "(:dateFrom IS NULL OR o.dateCreate >= :dateFrom) AND " +
                         "(:dateTo IS NULL OR o.dateCreate <= :dateTo) AND " +
                         "(:searchKeyword IS NULL OR " +
-                        " CAST(o.total AS string) LIKE CONCAT('%', :searchKeyword, '%'))")
+                        " CAST(o.shift.userEnitty.fullname AS string) LIKE CONCAT('%', :searchKeyword, '%'))")
         Page<OrderEntity> filterOrders(
                         @Param("statusOrder") OrderStatus statusOrder,
                         @Param("idOrder") Integer idOrder,
@@ -37,25 +37,23 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Integer> {
                         @Param("searchKeyword") String searchKeyword,
                         Pageable pageable);
 
+        long count(Specification<OrderEntity> spec);
 
-	long count(Specification<OrderEntity> spec);
+        List<OrderEntity> findAll(Specification<OrderEntity> spec);
 
-	List<OrderEntity> findAll(Specification<OrderEntity> spec);
+        List<OrderEntity> findAllByStatusOrderOrderByDateModify(OrderStatus completed);
 
-	List<OrderEntity> findAllByStatusOrderOrderByDateModify(OrderStatus completed);
-
-	@Query("SELECT o FROM OrderEntity o " +
-            "WHERE o.statusOrder = :statusOrder " +
-            "AND (:startDate IS NULL OR o.dateModify >= :startDate) " +
-            "AND (:endDate IS NULL OR o.dateModify <= :endDate) " +
-            "AND (:month IS NULL OR FUNCTION('MONTH', o.dateModify) = :month) " +
-            "AND (:year IS NULL OR FUNCTION('YEAR', o.dateModify) = :year)" +
-            "ORDER BY o.dateModify ASC")
-    List<OrderEntity> findOrdersByCriteria(
-            @Param("statusOrder") OrderStatus statusOrder,
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate,
-            @Param("month") Integer month,
-            @Param("year") Integer year
-    );
+        @Query("SELECT o FROM OrderEntity o " +
+                        "WHERE o.statusOrder = :statusOrder " +
+                        "AND (:startDate IS NULL OR o.dateModify >= :startDate) " +
+                        "AND (:endDate IS NULL OR o.dateModify <= :endDate) " +
+                        "AND (:month IS NULL OR FUNCTION('MONTH', o.dateModify) = :month) " +
+                        "AND (:year IS NULL OR FUNCTION('YEAR', o.dateModify) = :year)" +
+                        "ORDER BY o.dateModify ASC")
+        List<OrderEntity> findOrdersByCriteria(
+                        @Param("statusOrder") OrderStatus statusOrder,
+                        @Param("startDate") Date startDate,
+                        @Param("endDate") Date endDate,
+                        @Param("month") Integer month,
+                        @Param("year") Integer year);
 }

@@ -79,7 +79,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public Page<TableResponseDTO> getTablesFromFilter(String nameTable, TableStatus status, Integer idArea,
-                                                      Pageable pageable) {
+            Pageable pageable) {
         // Sử dụng idArea để lọc bàn theo khu vực
         Page<TableEntity> tableEntities = tableRepository.findByFilters(nameTable, status, idArea, pageable);
 
@@ -191,15 +191,20 @@ public class TableServiceImpl implements TableService {
         }
         return tableMapper.toTableResponseDTO(tableNeedVerify);
     }
+
     @Override
-	public ApiRespone<?> updateStatusCurrent(int idTable, TableStatusCurrentOrderRequestDTO request) {
-		TableEntity table = tableRepository.findById(idTable)
+    public ApiRespone<?> updateStatusCurrent(int idTable, TableStatusCurrentOrderRequestDTO request) {
+        TableEntity table = tableRepository.findById(idTable)
                 .orElseThrow(() -> new RuntimeException("Table_not_found"));
 
-        table.setStatus(request.getStatus()); 
+        table.setStatus(request.getStatus());
         table.setCurrentOrderId(request.getCurrentOrderId());
         TableEntity updatedTable = tableRepository.save(table);
-        return ApiRespone.builder().result(tableMapper.toTableResponseDTO(updatedTable)).build(); 
-	}
+        return ApiRespone.builder().result(tableMapper.toTableResponseDTO(updatedTable)).build();
+    }
 
+    @Override
+    public List<TableEntity> getByStatus(TableStatus status) {
+        return tableRepository.findByStatus(status);
+    }
 }

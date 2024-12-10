@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.entity.FoodEntity;
 import com.example.demo.request.FoodRequestDTO;
 import com.example.demo.respone.FoodResponeDTO;
 
@@ -25,4 +26,5 @@ public interface FoodService {
 
     public List<FoodResponeDTO> getFoodByIdCategory(int idCategory);
 
+    List<FoodEntity> searchByName(String nameFood);
 }
