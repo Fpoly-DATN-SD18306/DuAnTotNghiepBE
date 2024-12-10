@@ -15,11 +15,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.entity.FoodEntity;
 import com.example.demo.entity.PromotionEntity;
 import com.example.demo.map.PromotionMapper;
 import com.example.demo.repository.PromotionRepository;
 import com.example.demo.request.PromotionRequestDTO;
 import com.example.demo.respone.ApiRespone;
+import com.example.demo.respone.FoodResponeDTO;
 import com.example.demo.respone.PromotionResponeDTO;
 import com.example.demo.service.PromotionService;
 
@@ -32,9 +34,12 @@ public class PromotionServiceIml implements PromotionService{
 	@Autowired
 	PromotionMapper mapper;
 	@Override
-	public PromotionResponeDTO getFoodById(int idPromotion) {
-		// TODO Auto-generated method stub
-		return null;
+	public PromotionResponeDTO getPromotionById(int idPromotion) {
+		System.out.println(idPromotion);
+		PromotionEntity promotionEntity = promotionRepository.findById(idPromotion)
+				.orElseThrow(() -> new RuntimeException("Promotion_not_exist"));
+		PromotionResponeDTO responeDTO = mapper.toPromotionResponeDTO(promotionEntity);
+		return responeDTO;
 	}
 
 	@Override
@@ -80,7 +85,7 @@ public class PromotionServiceIml implements PromotionService{
 	         
 	}
 	@Override
-	public Page<PromotionResponeDTO> getPromotionFromFilter(String namePromotion, String status,String sortField,String sortDirection, Pageable pageable) {
+	public Page<PromotionResponeDTO> getPromotionFromFilter(String namePromotion, String status,String isIncreasePrice,String sortField,String sortDirection, Pageable pageable) {
 	    try {
 	        Date currentDate = new Date();
 	        Specification<PromotionEntity> spec = Specification.where(
@@ -91,6 +96,11 @@ public class PromotionServiceIml implements PromotionService{
 	            spec = spec.and((root, query, criteriaBuilder) ->
 	                    criteriaBuilder.like(root.get("namePromotion"), "%" + namePromotion + "%"));
 	        }
+	        if(isIncreasePrice!=null){
+	        	spec = spec.and((root, query, criteriaBuilder) ->
+	        	criteriaBuilder.equal(root.get("isIncreasePrice"), Boolean.valueOf(isIncreasePrice)));
+	         }
+
 	        if (status != null && !status.isEmpty()) {
 	            if ("expired".equals(status)) {
 	                spec = spec.and((root, query, criteriaBuilder) ->
@@ -114,37 +124,4 @@ public class PromotionServiceIml implements PromotionService{
 	        throw new RuntimeException("Promotion_not_found");
 	    }
 	}
-//	@Override
-//	public Page<PromotionResponeDTO> getPromotionFromFilter(String namePromotion,String status, Pageable pageable) {
-//		 try {
-//			 Date currentDate = new Date();
-//			 Specification<PromotionEntity> spec = Specification.where(
-//					    (root, query, criteriaBuilder) -> criteriaBuilder.notEqual(root.get("isDeleted"), true)
-//					);
-//			 
-//			    if (namePromotion != null && !namePromotion.isEmpty()) {
-//			        spec = spec.and((root, query, criteriaBuilder) ->
-//			                criteriaBuilder.like(root.get("namePromotion"), "%" + namePromotion + "%"));
-//			    }
-//			    if (status != null && !status.isEmpty()) {
-//			    	if ("expired".equals(status)) {
-//			            spec = spec.and((root, query, criteriaBuilder) ->
-//			                criteriaBuilder.lessThan(root.get("endDate"), currentDate));
-//			        } else if ("active".equals(status)) {
-//			            spec = spec.and((root, query, criteriaBuilder) ->
-//			                criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), currentDate));
-//			        }
-//			      }
-//			    Page<PromotionEntity> entities = promotionRepository.findAll(spec, pageable);
-//
-//			    List<PromotionResponeDTO> prosDtos = entities.stream()
-//			            .map(mapper::toPromotionResponeDTO)
-//			            .collect(Collectors.toList());
-//
-//			    return new PageImpl<>(prosDtos, pageable, entities.getTotalElements());
-//	        } catch (NumberFormatException e) {
-//	            throw new RuntimeException("Promotion_not_found");
-//	        }
-//
-//}
 	}

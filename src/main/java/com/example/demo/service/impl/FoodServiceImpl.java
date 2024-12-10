@@ -157,4 +157,8 @@ public class FoodServiceImpl implements FoodService {
 		}
 	}
 
+	@Override
+	public List<FoodEntity> searchByName(String nameFood) {
+		return foodRepository.findByNameLike(nameFood);
+	}
 }

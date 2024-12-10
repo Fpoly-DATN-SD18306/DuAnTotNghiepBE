@@ -1,7 +1,9 @@
 package com.example.demo.controller.admin;
 
+import com.example.demo.entity.TableEntity;
 import com.example.demo.enums.TableStatus;
 import com.example.demo.request.TableRequestDTO;
+import com.example.demo.request.TableStatusCurrentOrderRequestDTO;
 import com.example.demo.request.TableStatusRequestDTO;
 import com.example.demo.respone.ApiRespone;
 import com.example.demo.respone.TableResponseDTO;
@@ -15,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("api/v1/tables")
@@ -101,6 +105,17 @@ public class ManageTableController {
 	@PutMapping("{id}/locked")
 	public ApiRespone<?> lockedTable(@PathVariable("id") int idTable) {
 		return tableService.lockedTable(idTable);
+	}
+
+	@PutMapping("{id}/statusAndCurrent")
+	public ApiRespone<?> updateStatusAndCurrent(@PathVariable("id") int id,
+			@RequestBody TableStatusCurrentOrderRequestDTO request) {
+		return tableService.updateStatusCurrent(id, request);
+	}
+
+	@GetMapping("status/{status}")
+	public ApiRespone<List<TableEntity>> getMethodName(@PathVariable("status") TableStatus status) {
+		return ApiRespone.<List<TableEntity>>builder().result(tableService.getByStatus(status)).build();
 	}
 
 }

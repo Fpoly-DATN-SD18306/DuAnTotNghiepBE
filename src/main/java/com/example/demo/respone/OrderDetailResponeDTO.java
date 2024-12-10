@@ -25,9 +25,11 @@ import lombok.experimental.FieldDefaults;
 public class OrderDetailResponeDTO {
     Integer idOrderDetail;
     int quantity;
+    int idFood;
     double price;
     double totalPrice;
     String note;
-    String namefood;
+    String nameFood;
     float discount;
+    String thumbnail;
 }

@@ -44,4 +44,6 @@ public interface TableRepository extends JpaRepository<TableEntity, Integer> {
 			@Param("idArea") Integer idArea,
 			Pageable pageable);
 
+	List<TableEntity> findByStatus(TableStatus status);
+
 }
