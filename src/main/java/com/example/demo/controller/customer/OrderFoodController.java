@@ -53,4 +53,11 @@ public class OrderFoodController {
         messagingTemplate.convertAndSend("/topic/callStaff", table);
         return ApiRespone.builder().result(table).build();
     }
+
+    @GetMapping("payment/{idTable}")
+    public ApiRespone<?> callPayment(@PathVariable("idTable") Integer idTable) {
+        TableEntity table = tableRepository.findById(idTable).get();
+        messagingTemplate.convertAndSend("/topic/payment", table);
+        return ApiRespone.builder().result(table).build();
+    }
 }

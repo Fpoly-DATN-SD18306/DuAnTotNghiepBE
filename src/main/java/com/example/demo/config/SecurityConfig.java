@@ -50,7 +50,7 @@ public class SecurityConfig {
 				(requests) -> requests
 						.requestMatchers(EndPointPublic).permitAll()
 						.requestMatchers(EndPointManager).hasAuthority("SCOPE_MANAGER")
-						.anyRequest().permitAll());
+						.anyRequest().authenticated());
 		http.oauth2ResourceServer(oauth2 -> oauth2
 				.jwt(jwtConfig -> jwtConfig.decoder(jwtDecoder))
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint));
