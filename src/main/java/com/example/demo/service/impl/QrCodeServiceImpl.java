@@ -3,10 +3,12 @@ package com.example.demo.service.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,21 +48,23 @@ public class QrCodeServiceImpl implements QrCodeService {
 	private String hostFE;
 
 	private String formatNameQr = "QRCode_Table_";
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
 	@Override
 	public TableResponseDTO createQr(int idTable) {
 		TableEntity table = tableRepository.findById(idTable)
 				.orElseThrow(() -> new RuntimeException("Table_not_exist"));
-		if (table.getLinkImageQr() != null) {
+		if (table.getLinkImageQr() != null ) {
 			throw new RuntimeException("QR_exist");
 		}
 		String nameImg = formatNameQr + table.getNameTable() + ".png";
 		Long secretKey = Math.round(Math.random() * 10000000);
 		table.setNameImageQr(nameImg);
-		table.setLinkImageQr(hostBE + "/QRCode/" + nameImg);
 		table.setSecretKey(secretKey);
 		try {
-			generateQrCodeForTable(nameImg, idTable, secretKey);
+//			generateQrCodeForTable(nameImg, idTable, secretKey);
+			table.setLinkImageQr(generateQrCodeForTableCloudinary(nameImg, idTable, secretKey));
 			tableRepository.save(table);
 		} catch (WriterException e) {
 			// TODO Auto-generated catch block
@@ -91,7 +95,28 @@ public class QrCodeServiceImpl implements QrCodeService {
 
 		System.out.println("Done !");
 	}
+	public String generateQrCodeForTableCloudinary(String nameTable, int idTable, Long key) throws WriterException, IOException {
 
+		String data = hostFE + "/?table=" + idTable + "&secretKey=" + key;
+
+		QRCodeWriter qrCodeWriter = new QRCodeWriter();
+		BitMatrix matrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, 250, 250);
+
+		File rootOutputFile = new File("src/main/resources/static/QRCode");
+		if (!rootOutputFile.exists()) {
+			rootOutputFile.mkdirs();
+		}
+		Path path = Paths.get(rootOutputFile.getAbsolutePath(), nameTable);
+
+		MatrixToImageWriter.writeToPath(matrix, "PNG", path);
+		Path pathOP = FileSystems.getDefault().getPath(path.toString());
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//		MatrixToImageWriter.writeToStream(matrix, "PNG", outputStream);
+		MatrixToImageWriter.writeToPath(matrix, "PNG", pathOP);
+		Map<String,String> result= cloudinaryService.uploadFile(pathOP.toFile());
+	    return result.get("url");
+	}
 	// Update qrcode mới
 	@Transactional
 	@Override

@@ -7,6 +7,7 @@ import com.example.demo.respone.FoodResponeDTO;
 import com.example.demo.service.FoodService;
 import jakarta.validation.Valid;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class ManageFoodController {
 
     @PostMapping
     public ApiRespone<?> postFood(@ModelAttribute @Valid FoodRequestDTO requestDTO,
-            @RequestParam(name = "file", required = false) MultipartFile file) {
+            @RequestParam(name = "file", required = false) MultipartFile file) throws IOException {
         System.out.println(requestDTO.toString());
         return ApiRespone.builder()
                 .result(foodService.saveFood(requestDTO, file))

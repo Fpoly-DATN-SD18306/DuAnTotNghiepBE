@@ -18,6 +18,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,9 @@ public class FoodServiceImpl implements FoodService {
 
 	@Autowired
 	private FileService fileService;
+
+	@Autowired
+	private CloudinaryService cloudinaryService;
 
 	@Autowired
 	private CategoryRepository categoryRepository;
@@ -68,7 +73,7 @@ public class FoodServiceImpl implements FoodService {
 
 	@Transactional
 	@Override
-	public FoodResponeDTO saveFood(FoodRequestDTO requestDTO, MultipartFile file) {
+	public FoodResponeDTO saveFood(FoodRequestDTO requestDTO, MultipartFile file) throws IOException {
 		FoodEntity foodEntity = foodRepository.findByNameFood(requestDTO.getNameFood().trim());
 		CategoryFoodEntity categoryFood = categoryRepository.findById(requestDTO.getIdCategory())
 				.orElseThrow(() -> new RuntimeException("Category_not_found"));
@@ -79,8 +84,9 @@ public class FoodServiceImpl implements FoodService {
 		if (file != null) {
 			System.out.println(file.getOriginalFilename());
 
-			foodEntity.setImgFood(file.getOriginalFilename());
-			fileService.saveFile(file);
+			foodEntity.setImgFood((String) cloudinaryService.uploadImage(file).get("url"));
+//			fileService.saveFile(file);
+
 		}
 		foodEntity.setCategory(categoryFood);
 		System.out.println(requestDTO.getDiscount());
@@ -104,6 +110,11 @@ public class FoodServiceImpl implements FoodService {
 
 		if (file != null && !file.getOriginalFilename().trim().equals("")) {
 			imgFoodTemp = file.getOriginalFilename();
+			try {
+				foodEntity.setImgFood((String) cloudinaryService.uploadImage(file).get("url"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			fileService.saveFile(file);
 		}
 		foodEntity.setCategory(categoryFood);
