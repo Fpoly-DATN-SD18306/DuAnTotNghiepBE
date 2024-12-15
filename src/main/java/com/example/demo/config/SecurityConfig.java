@@ -42,7 +42,7 @@ public class SecurityConfig {
 			"api/payment-VNPay", "/api/v1/foods/**", "/api/v1/foods", "api/orderCustomer/**", "/api/v1/tables",
 			"/api/v1/tables/**",
 			"/api/v1/separateandmergeorder", "api/v1/separateandmergeorder/**", "api/v1/promotions",
-			"api/v1/promotions/**" };
+			"api/v1/promotions/**" ,"api/order/payment/**"};
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

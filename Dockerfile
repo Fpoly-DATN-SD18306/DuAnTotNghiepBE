@@ -1,4 +1,4 @@
-FROM openjdk:24-jdk
+FROM openjdk:17-jdk
 
 WORKDIR /usr/app
 

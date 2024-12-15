@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import java.io.IOException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private FileService fileService;
+
+	@Autowired
+	private CloudinaryService cloudinaryService;
 	@Override
 	public Page<UserResponeDTO> getAllUser() {
 		return new PageImpl<>(userRepository.findAll().stream().map(userMapper::toUserResponeDTO).collect(Collectors.toList()));
@@ -54,9 +58,12 @@ public class UserServiceImpl implements UserService {
 		
 		if (file != null) {
 			System.out.println(file.getOriginalFilename());
-
-			userEnitty.setImgUser(file.getOriginalFilename());
-			fileService.saveFile(file);
+			try {
+				userEnitty.setImgUser((String) cloudinaryService.uploadImage(file).get("url"));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+//			fileService.saveFile(file);
 		}
 		userEnitty.setPassword("123");
 		userEnitty.setIsChangedPass(false);
@@ -94,9 +101,11 @@ public class UserServiceImpl implements UserService {
 			userEntity.setIsChangedPass(true);
 		}
 	    if (file != null && !file.getOriginalFilename().trim().isEmpty()) {
-	        String imgUserTemp = file.getOriginalFilename();
-	        fileService.saveFile(file); 
-	        userEntity.setImgUser(imgUserTemp); 
+			try {
+				userEntity.setImgUser((String) cloudinaryService.uploadImage(file).get("url"));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 	    }
 
 	  

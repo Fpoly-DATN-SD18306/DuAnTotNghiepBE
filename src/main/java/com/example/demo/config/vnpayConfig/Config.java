@@ -17,14 +17,14 @@ import java.util.*;
  * @author CTT VNPAY
  */
 public class Config {
-
+    @Value("${host.be}")
+    public static String hostBE;
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8080/api/payment-VNPay";
+    public static String vnp_ReturnUrl = hostBE+"/api/payment-VNPay";
     public static String vnp_TmnCode = "KRO4KZUQ";
     public static String secretKey = "T6UJ3F6A9LJ7LMVRA1A26ILML290TK4G";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-    @Value("${host.be}")
-    public static String hostBE;
+
 
     public static String md5(String message) {
         String digest = null;
