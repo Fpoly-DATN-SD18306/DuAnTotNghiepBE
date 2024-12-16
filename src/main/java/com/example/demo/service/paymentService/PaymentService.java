@@ -26,10 +26,11 @@ public class PaymentService {
 
     @Autowired
     OrderRepository orderRepository;
-	@Autowired
-	PromotionRepository promotionRepository;
+    @Autowired
+    PromotionRepository promotionRepository;
     @Autowired
     TableRepository tableRepository;
+
 
     public void paymentBycash(int idOrder , int idPromotion) {
 
@@ -42,7 +43,7 @@ public class PaymentService {
         }
         PromotionEntity promotionEntity = promotionRepository.findByIdPromotion(idPromotion);
         if (promotionEntity == null) {
-        	orderNeedPayment.setPromotionEntity(null);
+            orderNeedPayment.setPromotionEntity(null);
             orderNeedPayment.setNamePaymentMethod(PaymentMethod.Cash.getName());
             orderNeedPayment.setStatusOrder(OrderStatus.Completed);
             orderNeedPayment.setPaymentDate(new Date());
@@ -54,25 +55,28 @@ public class PaymentService {
             table.setCurrentIP(null);
             tableRepository.save(table);
         } else {
-        	 if(promotionEntity.isIncreasePrice()) {
-      		   orderNeedPayment.setTotal(orderNeedPayment.getTotal()+(orderNeedPayment.getTotal() *promotionEntity.getDiscount() / 100));
+            if(promotionEntity.isIncreasePrice()) {
+                Double total = orderNeedPayment.getTotal()+(orderNeedPayment.getTotal() *promotionEntity.getDiscount() / 100);
+                orderNeedPayment.setTotal(Math.round(total/1000)*1000);
 
 
-         }else if (!promotionEntity.isIncreasePrice()) {
-      	   orderNeedPayment.setTotal(orderNeedPayment.getTotal()-(orderNeedPayment.getTotal() *promotionEntity.getDiscount() / 100));
-         }
+            }else if (!promotionEntity.isIncreasePrice()) {
+                Double total = orderNeedPayment.getTotal()-(orderNeedPayment.getTotal() *promotionEntity.getDiscount() / 100);
+                orderNeedPayment.setTotal(Math.round(total/1000)*1000);
 
-          orderNeedPayment.setPromotionEntity(promotionEntity);
-          orderNeedPayment.setNamePaymentMethod(PaymentMethod.Cash.getName());
-          orderNeedPayment.setStatusOrder(OrderStatus.Completed);
-          orderNeedPayment.setPaymentDate(new Date());
-          orderRepository.save(orderNeedPayment);
-          TableEntity table = orderNeedPayment.getTableEntity();
-          table.setStatus(TableStatus.AVAILABLE);
-          table.setCurrentOrderId(null);
-          table.setIdOrderMain(null);
-          table.setCurrentIP(null);
-          tableRepository.save(table);
+            }
+
+            orderNeedPayment.setPromotionEntity(promotionEntity);
+            orderNeedPayment.setNamePaymentMethod(PaymentMethod.Cash.getName());
+            orderNeedPayment.setStatusOrder(OrderStatus.Completed);
+            orderNeedPayment.setPaymentDate(new Date());
+            orderRepository.save(orderNeedPayment);
+            TableEntity table = orderNeedPayment.getTableEntity();
+            table.setStatus(TableStatus.AVAILABLE);
+            table.setCurrentOrderId(null);
+            table.setIdOrderMain(null);
+            table.setCurrentIP(null);
+            tableRepository.save(table);
         }
 
     }
@@ -86,21 +90,24 @@ public class PaymentService {
         }
 
         PromotionEntity promotionEntity = promotionRepository.findByIdPromotion(idPromotion);
-         double totalNeedPay = orderNeedPayment.getTotal();
+        double totalNeedPay = orderNeedPayment.getTotal();
         try {
-        	 if (promotionEntity != null) {
-        		 orderNeedPayment.setPromotionEntity(promotionEntity);
-        	    boolean checkIncrease = promotionEntity.isIncreasePrice();
-        		 if(checkIncrease) {
-                     totalNeedPay = totalNeedPay +(totalNeedPay *promotionEntity.getDiscount() / 100);
-               }else {
-                     totalNeedPay = totalNeedPay -(totalNeedPay *promotionEntity.getDiscount() / 100);
-               }
-                 orderNeedPayment.setPromotionEntity(promotionEntity);
+            if (promotionEntity != null) {
+                orderNeedPayment.setPromotionEntity(promotionEntity);
+                boolean checkIncrease = promotionEntity.isIncreasePrice();
+                if(checkIncrease) {
 
-        	 } else {
-                 orderNeedPayment.setPromotionEntity(null);
-             }
+                    totalNeedPay = totalNeedPay +(totalNeedPay *promotionEntity.getDiscount() / 100);
+                    totalNeedPay = (Math.round(totalNeedPay/1000)*1000);
+                }else {
+                    totalNeedPay = totalNeedPay -(totalNeedPay *promotionEntity.getDiscount() / 100);
+                    totalNeedPay = (Math.round(totalNeedPay/1000)*1000);
+                }
+                orderNeedPayment.setPromotionEntity(promotionEntity);
+
+            } else {
+                orderNeedPayment.setPromotionEntity(null);
+            }
             orderRepository.save(orderNeedPayment);
             return VNPayResponseDTO
                     .builder()
