@@ -4,6 +4,7 @@ import com.example.demo.entity.OrderEntity;
 import com.example.demo.entity.OrderWaitChangeShiftEntity;
 import com.example.demo.entity.Shift;
 import com.example.demo.entity.UserEnitty;
+import com.example.demo.enums.OrderStatus;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.OrderWaitChangeShiftRepository;
 import com.example.demo.repository.ShiftRepository;
@@ -172,7 +173,9 @@ public class ShiftServiceImpl {
         double total = 0;
         double totalServing = 0;
         for (OrderEntity order : orders) {
-
+            if(order.getStatusOrder().equals(OrderStatus.Cancelled)){
+                continue;
+            }
             switch (order.getNamePaymentMethod()) {
                 case "cash":
                     totalCash += order.getTotal();

@@ -12,8 +12,8 @@ services :
         SPRING_DATASOURCE_URL: jdbc:mysql://35.221.212.250:3306/quanlynhahang
         SPRING_DATASOURCE_USERNAME: root
         SPRING_DATASOURCE_PASSWORD: 12345
-        host.be: "http://bedatn:8080"
-        host.fe: "http://fedatn:4200"
+        host.be: "http://35.198.241.251:8080"
+        host.fe: "http://35.198.241.251:4200"
       depends_on:
         - fe
     fe:
