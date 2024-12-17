@@ -110,7 +110,7 @@ public class FoodServiceImpl implements FoodService {
 
 		if (file != null && !file.getOriginalFilename().trim().equals("")) {
 			try {
-				foodEntity.setImgFood((String) cloudinaryService.uploadImage(file).get("url"));
+				imgFoodTemp = (String) cloudinaryService.uploadImage(file).get("url");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
