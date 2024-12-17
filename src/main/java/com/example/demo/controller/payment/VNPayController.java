@@ -27,7 +27,7 @@ public class VNPayController {
     SimpMessagingTemplate messagingTemplate;
 
     @PostMapping
-    public ApiRespone<?> postRequestCallPayment(@RequestParam int idOrder,@RequestParam int idPromotion) {
+    public ApiRespone<?> postRequestCallPayment(@RequestParam int idOrder,@RequestParam(required = false) Integer idPromotion) {
 
         return ApiRespone
                 .builder()
