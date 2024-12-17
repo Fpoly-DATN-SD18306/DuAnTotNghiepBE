@@ -12,6 +12,7 @@ import com.example.demo.respone.VNPayResponseDTO;
 import com.example.demo.service.impl.OrderServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -33,7 +34,8 @@ public class VNPayService {
 
     @Autowired
     TableRepository tableRepository;
-
+    @Value("${host.be}")
+    public  String hostBE;
     public String payment(double totalPrice, String vnp_TxnRef, String bankCode) throws IOException {
 
         String vnp_Version = "2.1.0";
@@ -60,7 +62,6 @@ public class VNPayService {
         if (bankCode != null && !bankCode.isEmpty()) {
             vnp_Params.put("vnp_BankCode", bankCode);
         }
-        System.out.println(bankCode);
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
         vnp_Params.put("vnp_OrderType", orderType);
@@ -71,7 +72,8 @@ public class VNPayService {
         } else {
             vnp_Params.put("vnp_Locale", "vn");
         }
-        vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ReturnUrl",hostBE+Config.vnp_ReturnUrl);
+        System.out.println(hostBE+Config.vnp_ReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
         TimeZone timeZone = TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
         Calendar cld = Calendar.getInstance(timeZone);

@@ -81,15 +81,17 @@ public class PaymentService {
 
     }
 
-    public VNPayResponseDTO paymentByVNpay(int idOrder, int idPromotion) {
+    public VNPayResponseDTO paymentByVNpay(int idOrder, Integer idPromotion) {
         OrderEntity orderNeedPayment = orderRepository
                 .findById(idOrder)
                 .orElseThrow(() -> new RuntimeException("Order_not_found"));
         if (orderNeedPayment.getStatusOrder() == OrderStatus.Completed) {
             throw new RuntimeException("Order_already_completed");
         }
-
-        PromotionEntity promotionEntity = promotionRepository.findByIdPromotion(idPromotion);
+        PromotionEntity promotionEntity = null;
+        if(idPromotion!=null){
+            promotionEntity = promotionRepository.findByIdPromotion(idPromotion);
+        }
         double totalNeedPay = orderNeedPayment.getTotal();
         try {
             if (promotionEntity != null) {
