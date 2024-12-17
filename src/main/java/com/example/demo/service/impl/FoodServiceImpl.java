@@ -109,7 +109,6 @@ public class FoodServiceImpl implements FoodService {
 		foodEntity = foodMapper.toFoodEntity(requestDTO);
 
 		if (file != null && !file.getOriginalFilename().trim().equals("")) {
-			imgFoodTemp = file.getOriginalFilename();
 			try {
 				foodEntity.setImgFood((String) cloudinaryService.uploadImage(file).get("url"));
 			} catch (IOException e) {
@@ -118,7 +117,7 @@ public class FoodServiceImpl implements FoodService {
 		}
 		foodEntity.setCategory(categoryFood);
 		foodEntity.setIdFood(idFood);
-
+		foodEntity.setImgFood(imgFoodTemp);
 
 		foodRepository.save(foodEntity);
 

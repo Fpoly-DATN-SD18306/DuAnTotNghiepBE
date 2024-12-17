@@ -18,4 +18,5 @@ public class InfoCheckoutShiftDTO {
     Double shiftRevenue;
     Double totalServing;
     LocalDateTime DateStart;
+    String staffName;
 }
