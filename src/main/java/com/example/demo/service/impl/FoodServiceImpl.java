@@ -115,14 +115,10 @@ public class FoodServiceImpl implements FoodService {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			fileService.saveFile(file);
 		}
 		foodEntity.setCategory(categoryFood);
 		foodEntity.setIdFood(idFood);
-		foodEntity.setImgFood(imgFoodTemp);
 
-		System.out.println(foodMapper.toFoodEntity(requestDTO).toString());
-		System.out.println(foodEntity.toString());
 
 		foodRepository.save(foodEntity);
 
