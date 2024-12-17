@@ -148,6 +148,9 @@ public class TableServiceImpl implements TableService {
                     .build();
         }
         TableEntity table = optionaltable.get();
+        if (table.getCurrentOrderId() != null) {
+            throw new RuntimeException("Tables are being serving");
+        }
         table.setLocked(true);
         tableRepository.save(table);
         return ApiRespone.builder()
@@ -205,6 +208,6 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public List<TableEntity> getByStatus(TableStatus status) {
-        return tableRepository.findByStatus(status);
+        return tableRepository.findByStatusAndIsLockedFalse(status);
     }
 }
