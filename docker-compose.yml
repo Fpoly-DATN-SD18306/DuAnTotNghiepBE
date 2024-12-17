@@ -9,9 +9,9 @@ services :
       ports:
         - "8080:8080"
       environment:
-        SPRING_DATASOURCE_URL: jdbc:mysql://35.221.212.250:3306/quanlynhahang
-        SPRING_DATASOURCE_USERNAME: root
-        SPRING_DATASOURCE_PASSWORD: 12345
+        SPRING_DATASOURCE_URL: jdbc:mysql://192.168.2.18:3306/quanlynhahang
+        SPRING_DATASOURCE_USERNAME: sa
+        SPRING_DATASOURCE_PASSWORD: 1234
         host.be: "http://192.168.2.18:8080"
         host.fe: "http://192.168.2.18:4200"
       depends_on:
