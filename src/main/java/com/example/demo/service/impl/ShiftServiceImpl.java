@@ -202,6 +202,7 @@ public class ShiftServiceImpl {
                 .cashAmountEnd(totalCash)
                 .cashAtStart(shift.getCashAtStart())
                 .DateStart(shift.getDateStart())
+                .staffName(shift.getUserEnitty().getFullname())
                 .build();
     }
 

@@ -35,6 +35,7 @@ public class TableEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_area")
 	@JsonBackReference
+	@JsonIgnore
 	AreaEntity area;
 	Integer currentOrderId;
 	String currentIP;
