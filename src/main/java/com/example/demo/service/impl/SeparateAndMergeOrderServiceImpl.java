@@ -110,7 +110,7 @@ public class SeparateAndMergeOrderServiceImpl implements SeparateAndMergeOrderSe
     	}
 
     	private long calculateTotalPrice(int quantity, double price, double discount) {
-    	    return (long) (quantity * price * (100 - discount) / 100);
+            return (long) Math.round((quantity * price * (100 - discount) / 100)/1000)*1000 ;
     	}
 
      @Override

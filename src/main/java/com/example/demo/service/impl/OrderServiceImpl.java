@@ -136,11 +136,14 @@ public class OrderServiceImpl implements OrderService {
                     .price(food.getPriceFood())
                     .orderEntity(orderEntity)
                     .build();
+            Double total = orderDetail.getPrice() * orderDetail.getQuantity()
+                    * (100 - food.getDiscount()) / 100;
 
-            orderDetail.setTotalPrice(orderDetail.getPrice() * orderDetail.getQuantity()
-                    * (100 - food.getDiscount()) / 100);
 
-            orderEntity.setTotal(orderEntity.getTotal() + orderDetail.getTotalPrice());
+            orderDetail.setTotalPrice(Math.round(total/1000)*1000);
+
+
+            orderEntity.setTotal(Math.round((orderEntity.getTotal() + orderDetail.getTotalPrice())/1000)*1000);
             System.out.println("Plio : " + orderDetail.getTotalPrice());
 
             orderDetailRepository.save(orderDetail);
@@ -230,8 +233,12 @@ public class OrderServiceImpl implements OrderService {
         if (existingOrderDetail.isPresent()) {
             orderDetail = existingOrderDetail.get();
             orderDetail.setQuantity(orderDetail.getQuantity() + foodOrder.getQuantity());
-            orderDetail.setTotalPrice(orderDetail.getPrice() * orderDetail.getQuantity()
-                    * (100 - foodEntity.getDiscount()) / 100);
+            Double total = orderDetail.getPrice() * orderDetail.getQuantity()
+                    * (100 - foodEntity.getDiscount()) / 100;
+
+
+            orderDetail.setTotalPrice(Math.round(total/1000)*1000);
+
 
             System.out.println("Trùng");
         } else {
@@ -241,8 +248,11 @@ public class OrderServiceImpl implements OrderService {
                     .price(foodEntity.getPriceFood())
                     .orderEntity(order)
                     .build();
-            orderDetail.setTotalPrice(orderDetail.getPrice() * orderDetail.getQuantity()
-                    * (100 - foodEntity.getDiscount()) / 100);
+            Double total = orderDetail.getPrice() * orderDetail.getQuantity()
+                    * (100 - foodEntity.getDiscount()) / 100;
+
+
+            orderDetail.setTotalPrice(Math.round(total/1000)*1000);
             orderDetailRepository.save(orderDetail);
         }
         order.setTotal(order.getListOrderDetail().stream()
@@ -285,8 +295,12 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Quantity_must_be_positive");
         }
         orderdetail.setQuantity(newQuantity);
-        orderdetail.setTotalPrice(orderdetail.getPrice() * newQuantity
-                * (100 - orderdetail.getFoodEntity().getDiscount()) / 100);
+        Double total = orderdetail.getPrice() * newQuantity
+                * (100 - orderdetail.getFoodEntity().getDiscount()) / 100;
+
+
+        orderdetail.setTotalPrice(Math.round(total/1000)*1000);
+
         orderEntity.setTotal(orderEntity.getListOrderDetail().stream()
                 .mapToDouble(OrderDetailEntity::getTotalPrice).sum());
 
